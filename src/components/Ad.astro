@@ -1,0 +1,69 @@
+---
+/**
+ * Reusable AdSense display unit.
+ *
+ * Usage inside any .mdx page:
+ *   import Ad from '../../../components/Ad.astro';
+ *   <Ad slot="1234567890" />
+ *
+ * The ad only renders when PUBLIC_ADSENSE_CLIENT is configured (see below),
+ * so local builds and un-monetized deploys stay clean.
+ *
+ * To enable: set the same publisher ID you put in astro.config.mjs here,
+ * and create an ad unit in your AdSense dashboard to get the `slot` number.
+ */
+const ADSENSE_CLIENT = ''; // e.g. 'ca-pub-XXXXXXXXXXXXXXXX' (must match config)
+
+interface Props {
+  slot?: string;
+  format?: string;
+  layout?: string;
+  label?: string;
+}
+
+const {
+  slot = '',
+  format = 'auto',
+  layout = '',
+  label = 'Advertisement',
+} = Astro.props;
+
+const enabled = Boolean(ADSENSE_CLIENT && slot);
+---
+
+{
+  enabled && (
+    <aside class="ad-slot" aria-label={label}>
+      <span class="ad-slot__label">{label}</span>
+      <ins
+        class="adsbygoogle"
+        style="display:block"
+        data-ad-client={ADSENSE_CLIENT}
+        data-ad-slot={slot}
+        data-ad-format={format}
+        data-ad-layout={layout || undefined}
+        data-full-width-responsive="true"
+      />
+      <script is:inline>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
+    </aside>
+  )
+}
+
+<style>
+  .ad-slot {
+    display: block;
+    margin: 2rem 0;
+    text-align: center;
+    min-height: 1px;
+  }
+  .ad-slot__label {
+    display: block;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--sl-color-gray-4);
+    margin-bottom: 0.35rem;
+  }
+</style>

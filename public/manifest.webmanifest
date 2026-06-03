@@ -1,0 +1,16 @@
+{
+  "name": "Backend Engineering, Explained",
+  "short_name": "BackendExplained",
+  "description": "A visual, plain-English guide to backend engineering and distributed systems.",
+  "start_url": "/Python-learning/",
+  "display": "standalone",
+  "background_color": "#0d1117",
+  "theme_color": "#0d1117",
+  "icons": [
+    {
+      "src": "/Python-learning/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

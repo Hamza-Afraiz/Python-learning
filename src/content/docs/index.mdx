@@ -1,0 +1,60 @@
+---
+title: Backend Engineering, Explained
+description: A visual, plain-English guide to backend engineering and distributed systems — Python async, FastAPI, PostgreSQL, Kafka, Temporal, Docker and observability — learned by asking the right questions.
+template: splash
+hero:
+  tagline: Distributed systems, async Python & data infrastructure — explained with diagrams and real project decisions, not jargon.
+  image:
+    file: ../../assets/logo.svg
+  actions:
+    - text: Start with the Visual Guides
+      link: /Python-learning/concepts/architecture/
+      icon: right-arrow
+      variant: primary
+    - text: Browse the Q&A Knowledge Base
+      link: /Python-learning/qa/session-1/
+      icon: open-book
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## Why this site exists
+
+Most backend tutorials tell you **what** to type. This site explains **why** —
+the tradeoffs behind every choice in a real, production-shaped system. It grew
+out of more than **100 real questions** asked while building a course platform:
+why Kafka over RabbitMQ, when a database lock is actually a transaction, why
+analytics lives in PostgreSQL and not MongoDB, how Temporal differs from Celery.
+
+Everything here is free, fast, and searchable. Hit <kbd>Ctrl</kbd>/<kbd>⌘</kbd> +
+<kbd>K</kbd> to search any concept instantly.
+
+## Explore by topic
+
+<CardGrid>
+  <Card title="System Architecture" icon="puzzle">
+    How the services fit together — API, workers, brokers and databases.
+    [Read the guide →](/Python-learning/concepts/architecture/)
+  </Card>
+  <Card title="Data & Storage" icon="document">
+    PostgreSQL vs MongoDB vs Cassandra — and when each one breaks.
+    [Read the guide →](/Python-learning/concepts/data-storage/)
+  </Card>
+  <Card title="Messaging & Events" icon="email">
+    Kafka, RabbitMQ, Celery and Temporal — what each layer actually does.
+    [Read the guide →](/Python-learning/concepts/messaging/)
+  </Card>
+  <Card title="Async Python" icon="rocket">
+    The event loop, why sync code blocks it, and Uvicorn vs Gunicorn.
+    [Read the guide →](/Python-learning/concepts/async-python/)
+  </Card>
+  <Card title="Observability" icon="approve-check">
+    Logs, metrics and traces — Prometheus, Grafana, OpenTelemetry & Jaeger.
+    [Read the guide →](/Python-learning/concepts/observability/)
+  </Card>
+  <Card title="Full Q&A Log" icon="open-book">
+    Every question, session by session, exactly as it was asked.
+    [Browse the sessions →](/Python-learning/qa/session-1/)
+  </Card>
+</CardGrid>

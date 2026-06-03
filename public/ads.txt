@@ -1,0 +1,4 @@
+# Google AdSense — replace pub-0000000000000000 with YOUR publisher number
+# (the digits after "ca-pub-" in your AdSense client ID), then redeploy.
+# Until you do this, leave the line commented so it doesn't report a bad seller.
+# google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0

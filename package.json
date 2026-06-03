@@ -1,0 +1,23 @@
+{
+  "name": "python-learning",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "A visual, SEO-optimized learning site covering backend engineering concepts: Python async, FastAPI, PostgreSQL, Kafka, Temporal, Docker, observability and more.",
+  "scripts": {
+    "gen": "node scripts/generate-content.mjs",
+    "dev": "npm run gen && astro dev",
+    "start": "npm run gen && astro dev",
+    "build": "npm run gen && astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.2.1",
+    "@astrojs/starlight": "^0.30.3",
+    "astro": "^5.1.1",
+    "sharp": "^0.33.5"
+  },
+  "devDependencies": {
+    "unist-util-visit": "^5.0.0"
+  }
+}

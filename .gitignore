@@ -1,0 +1,16 @@
+# build output
+dist/
+.astro/
+
+# dependencies
+node_modules/
+
+# generated content (rebuilt by `npm run gen`)
+src/content/docs/qa/
+public/og.png
+
+# os / editor
+.DS_Store
+*.log
+.vscode/
+.idea/
