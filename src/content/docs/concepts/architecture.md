@@ -55,15 +55,15 @@ flowchart TB
 | Layer | Component | Job |
 |---|---|---|
 | **Edge** | FastAPI + Uvicorn | Handle HTTP, auth, validation. Returns fast. |
-| **Workflow** | Temporal worker | Long, multi-step, *stateful* orchestration (e.g. publish a course → extract → chunk → embed). |
+| **Workflow** | Temporal worker | Long, multi-step, *stateful* orchestration (e.g. process an upload → extract → transform → store). |
 | **Tasks** | Celery worker | Independent fire-and-forget jobs (send email, generate PDF). |
-| **Event log** | Kafka | Durable stream of *facts* (`course.published`) many consumers can replay. |
+| **Event log** | Kafka | Durable stream of *facts* (`order.placed`) many consumers can replay. |
 | **Task queue** | RabbitMQ | Broker that hands one job to one worker. |
 | **Cache** | Redis | Fast ephemeral state and Celery result backend. |
-| **Core data** | PostgreSQL | Users, courses, enrollments, analytics, and vector search. |
+| **Core data** | PostgreSQL | Users, records, transactions, analytics, and vector search. |
 | **Documents** | MongoDB | Flexible, schema-light content where it fits. |
 
-## How one request flows: enrolling in a course
+## How one request flows: placing an order
 
 ```mermaid
 sequenceDiagram
@@ -74,14 +74,14 @@ sequenceDiagram
     participant K as Kafka
     participant C as Celery
 
-    U->>API: POST /enrollments
-    API->>PG: BEGIN (lock course row)
-    API->>PG: insert enrollment + outbox row
+    U->>API: POST /orders
+    API->>PG: BEGIN (lock inventory row)
+    API->>PG: insert order + outbox row
     API->>PG: COMMIT
     API-->>U: 201 Created (fast)
     Note over OB,K: later, asynchronously
     OB->>PG: read unsent outbox rows
-    OB->>K: publish "user.enrolled"
+    OB->>K: publish "order.placed"
     K->>C: consumer picks it up
     C->>PG: update analytics counters
 ```

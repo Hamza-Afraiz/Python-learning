@@ -18,7 +18,7 @@ flowchart TB
     Q -->|"Flexible documents,<br/>evolving schema"| MG[(MongoDB)]
     Q -->|"Massive write volume,<br/>time-series, multi-region"| CS[(Cassandra)]
 
-    PG --> PGu["Users · Courses · Enrollments<br/>Analytics · Vector search"]
+    PG --> PGu["Users · Orders · Payments<br/>Analytics · Vector search"]
     MG --> MGu["Raw content blobs<br/>Loose metadata"]
     CS --> CSu["Billions of events/day<br/>IoT · clickstream"]
 ```
@@ -38,14 +38,14 @@ flowchart TB
 ## Why analytics lives in PostgreSQL (not MongoDB)
 
 A common instinct is "analytics = NoSQL." But here the analytics queries are
-**relational aggregations** — counts, group-bys, joins across courses and
-enrollments. PostgreSQL does these natively and transactionally.
+**relational aggregations** — counts, group-bys, joins across users and
+orders. PostgreSQL does these natively and transactionally.
 
 ```mermaid
 flowchart LR
-    E["Enrollment event"] --> PG[(PostgreSQL)]
-    PG --> A1["COUNT enrollments<br/>GROUP BY course"]
-    PG --> A2["JOIN users × courses"]
+    E["Order event"] --> PG[(PostgreSQL)]
+    PG --> A1["COUNT orders<br/>GROUP BY product"]
+    PG --> A2["JOIN users × orders"]
     PG --> A3["Window functions<br/>over time"]
     style PG fill:#16243a,stroke:#3b82f6
 ```
@@ -61,9 +61,9 @@ DB required at this scale.
 
 ```mermaid
 flowchart LR
-    L["Lesson text"] --> CH["Chunk<br/>~400 tokens"]
+    L["Document text"] --> CH["Chunk<br/>~400 tokens"]
     CH --> EM["Embed<br/>384-dim vector"]
-    EM --> V[("lesson_chunks<br/>vector(384)")]
+    EM --> V[("text_chunks<br/>vector(384)")]
     Qy["Search query"] --> EM2["Embed query"]
     EM2 --> V
     V -->|"ORDER BY embedding <=> $vec<br/>LIMIT 5"| R["Top-K chunks"]

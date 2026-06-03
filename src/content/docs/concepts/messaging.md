@@ -69,7 +69,7 @@ sequenceDiagram
     participant W as Worker
     participant DB as PostgreSQL
 
-    API->>TS: start_workflow("publish course")
+    API->>TS: start_workflow("process upload")
     TS->>W: schedule workflow task
     W->>W: orchestrate steps (deterministic)
     W->>DB: activity: extract text

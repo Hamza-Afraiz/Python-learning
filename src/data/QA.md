@@ -1,4 +1,4 @@
-# SmartCourse — Concepts Q&A
+# Backend Engineering — Concepts Q&A
 
 Running log of questions asked during the project. Auto-appended each session.
 
@@ -22,7 +22,7 @@ Running log of questions asked during the project. Auto-appended each session.
 | **Nix/devenv** | Reproducible environments without containers | Most teams — niche skill |
 | **Testcontainers** | Spinning up services inside tests | Running the full app |
 
-**Decision for SmartCourse:** Docker Compose for running the stack + Testcontainers for the test suite.
+**Decision for the system:** Docker Compose for running the stack + Testcontainers for the test suite.
 
 ---
 
@@ -208,7 +208,7 @@ SELECT * FROM enrollments_by_student WHERE student_id = 5
 
 **When Postgres wins:** Complex queries, JOINs, ACID transactions, structured relational data.
 
-**For SmartCourse:** Postgres = source of truth (users, courses, enrollments). Cassandra/MongoDB = analytics and event data (write-heavy, simple lookups like lesson completion counts).
+**For the system:** Postgres = source of truth (users, courses, enrollments). Cassandra/MongoDB = analytics and event data (write-heavy, simple lookups like lesson completion counts).
 
 ---
 
@@ -238,7 +238,7 @@ Cassandra = sharding is the default, built-in behavior
 
 ---
 
-### Q: What does SmartCourse demand — SQL or Cassandra? Where does each fail?
+### Q: What does the system demand — SQL or Cassandra? Where does each fail?
 
 **A:**
 
@@ -256,7 +256,7 @@ Cassandra = sharding is the default, built-in behavior
 - Unknown query patterns upfront — table design depends on knowing exactly how you'll query. Wrong design = rebuild everything
 - Low volume apps — massive operational overhead for no benefit
 
-**For SmartCourse specifically:**
+**For the system specifically:**
 
 Core data (users, courses, enrollments, progress) → **PostgreSQL only**. These are relational, need JOINs, need ACID transactions, need foreign keys. Cassandra can't do this cleanly.
 
@@ -279,7 +279,7 @@ No. The PRD says "MongoDB / Cassandra" — pick one, not both.
 | Good for | Semi-structured content, documents | Time-series, event logs, massive writes |
 | Learning curve | Easy | Steep |
 
-**Decision for SmartCourse:** Neither is needed in Weeks 1–3. PostgreSQL handles everything comfortably at this scale.
+**Decision for the system:** Neither is needed in Weeks 1–3. PostgreSQL handles everything comfortably at this scale.
 
 If one is added later, **MongoDB is the better fit** because:
 - Course content (modules → lessons → chunks → text) is document-shaped — fits JSON naturally
@@ -315,7 +315,7 @@ When a student searches "python basics" — Postgres finds the intersection inst
 
 **A:**
 
-No. `content_type (video/text/pdf)` and `content_url` are from the Week 1 plan, not the PRD. The `content_url` is just a link to where a file is hosted (S3, CDN). SmartCourse stores the URL, not the video itself. No video infrastructure needed.
+No. `content_type (video/text/pdf)` and `content_url` are from the Week 1 plan, not the PRD. The `content_url` is just a link to where a file is hosted (S3, CDN). the system stores the URL, not the video itself. No video infrastructure needed.
 
 ---
 
@@ -491,7 +491,7 @@ users, courses, modules, lessons, enrollments, progress, certificates. Seven tab
 
 **A:**
 
-MongoDB can handle analytics — but PostgreSQL wins for SmartCourse's specific metrics.
+MongoDB can handle analytics — but PostgreSQL wins for the system's specific metrics.
 
 The PRD metrics are: counts, averages, group-bys, and JOINs between enrollments and courses. These are SQL-shaped problems.
 
@@ -527,7 +527,7 @@ Options for analytics storage (Week 3 decision):
 - **Kafka → sink** — events flow through Kafka, consumer writes to separate store. Decoupled but more infra.
 - **Separate Postgres DB** — protects core DB from analytics load.
 
-For SmartCourse's scale, Postgres is likely fine — but as a separate schema, decided in Week 3.
+For the system's scale, Postgres is likely fine — but as a separate schema, decided in Week 3.
 
 **Week 1 schema — final and clean:**
 users, courses, modules, lessons, enrollments, progress, certificates. Nothing else.
@@ -700,7 +700,7 @@ Every event (lesson completed, page viewed) = one tiny write. At scale = million
 
 The tradeoff: Cassandra pays for fast writes by making reads harder. Complex queries and aggregations are painful. That's fine for analytics — you mostly ask simple questions like "how many completions today?", not complex JOINs.
 
-Note: At SmartCourse's scale (tens of thousands of users), Postgres with proper indexes handles analytics fine. Cassandra is only worth it at 10M+ events/day.
+Note: At the system's scale (tens of thousands of users), Postgres with proper indexes handles analytics fine. Cassandra is only worth it at 10M+ events/day.
 
 ---
 
@@ -756,7 +756,7 @@ MongoDB fails at: strict multi-document consistency, deeply relational data, ext
 
 Cassandra fails at: unknown query patterns upfront (wrong partition key = rebuild everything), aggregations (SUM/AVG/GROUP BY), small teams (high operational overhead), modest data volume.
 
-**SmartCourse decision:**
+**the system decision:**
 - PostgreSQL → users, courses, modules, lessons, enrollments, progress
 - MongoDB → course content documents, chunked lesson text (Week 4, feeds RAG pipeline)
 - Cassandra → not needed at this scale
@@ -977,7 +977,7 @@ WAL also enables replication — replicas stream and replay the primary's WAL.
 
 ---
 
-### Q: What is the Saga / Compensation pattern? How does it apply to SmartCourse?
+### Q: What is the Saga / Compensation pattern? How does it apply to the system?
 
 **A:**
 
@@ -1028,11 +1028,11 @@ FastAPI → Kafka: "user.enrolled" event
 | Use case | Execute a job | Broadcast what happened |
 | Example | Send email | user.enrolled event |
 
-In SmartCourse: Kafka fires `user.enrolled` → Celery workers consume it to send email and update analytics. They work together.
+In the system: Kafka fires `user.enrolled` → Celery workers consume it to send email and update analytics. They work together.
 
 ---
 
-### Q: What is database replication and when would SmartCourse use it?
+### Q: What is database replication and when would the system use it?
 
 **A:**
 
@@ -1050,7 +1050,7 @@ Benefit: distribute read load. Analytics queries (heavy SELECTs) go to replica, 
 
 Tradeoff: replication lag — replica is slightly behind primary (milliseconds to seconds). For critical reads (e.g. "is this user enrolled?") — always read from primary. For analytics (slightly stale data is fine) — read from replica.
 
-SmartCourse at tens of thousands of users: one primary is fine. Add a replica when read queries start slowing down writes.
+the system at tens of thousands of users: one primary is fine. Add a replica when read queries start slowing down writes.
 
 ---
 
@@ -1071,7 +1071,7 @@ SmartCourse at tens of thousands of users: one primary is fine. Add a replica wh
 
 ---
 
-### Q: What is the GIL and how does it affect SmartCourse?
+### Q: What is the GIL and how does it affect the system?
 
 **A:**
 
@@ -1081,7 +1081,7 @@ Impact:
 - **Async I/O** — not affected. When a coroutine awaits (DB, network), it releases the GIL and another task runs. Async works fine.
 - **CPU-bound threads** — blocked by GIL. Two Python threads cannot compute in parallel. One runs, one waits.
 
-For SmartCourse:
+For the system:
 - API request handling (I/O bound) → async works perfectly, GIL not a problem
 - bcrypt hashing (CPU bound in one thread) → use `run_in_executor` to move to thread pool (GIL is released during C-extension work in bcrypt)
 - Heavy ML inference in future (Part B) → use Celery worker (separate process, separate GIL)
@@ -1825,7 +1825,7 @@ If **C** fails after **B** succeeded → run **B’s compensation**, then surfac
 
 **A:** Mirror the backend, which is **stateless JWT — there is no server session**. So the frontend is also sessionless:
 
-- **Login** posts the OAuth2 password form to `/auth/login` and gets a JWT back. Store it in `localStorage` (`smartcourse_token`). An axios request interceptor attaches `Authorization: Bearer <token>` on every call.
+- **Login** posts the OAuth2 password form to `/auth/login` and gets a JWT back. Store it in `localStorage` (`app_token`). An axios request interceptor attaches `Authorization: Bearer <token>` on every call.
 - **Role is not decoded from the token on the client.** Right after login (and on every app load with a stored token), `AuthContext` calls `/users/me` and keeps the returned `User` — including `role` — in React state. Role-dependent UI (nav links, route guards) is driven by that record.
 - **The client is never the authority.** Route guards (`ProtectedRoute`) are a UX convenience; the backend re-checks role and ownership on every request regardless. A tampered token fails server-side, and an axios response interceptor clears it on any `401`, bouncing the user to `/login`.
 
@@ -2067,13 +2067,13 @@ while True:
 
 Closest Node analogy: a **BullMQ worker** — a process whose entire job is to drain a queue. Our "queue" happens to be a Postgres table instead of Redis, but the shape is the same. In our compose stack it will look like the Temporal worker: own service, same `smart-course-app` image, long-running.
 
-At industrial scale you'd skip polling entirely and use Postgres logical replication via Debezium (Postgres *pushes* changes to the relay) — same idea, lower latency, more moving parts. Overkill for SmartCourse.
+At industrial scale you'd skip polling entirely and use Postgres logical replication via Debezium (Postgres *pushes* changes to the relay) — same idea, lower latency, more moving parts. Overkill for the system.
 
 ### Q: Doesn't RabbitMQ serve the same purpose as BullMQ / the outbox relay? What are the other options?
 
 **A:** They're at *different points* in the pipeline. The words "queue" and "worker" get reused, but the roles are distinct.
 
-| Tool | Role in SmartCourse | What it really is |
+| Tool | Role in the system | What it really is |
 |---|---|---|
 | Postgres `outbox` table | First durable hop — events land atomically with the business write | A regular table used as a queue |
 | Relay process | Bridge — drains outbox into Kafka | A long-running Python loop. Not a broker. |
@@ -2097,7 +2097,7 @@ The Celery+RabbitMQ pair lives *inside* each consumer's downstream path — it's
 
 **Other options for the relay's role**, increasing in latency-improvement and operational cost:
 
-1. **Polling relay (what we have).** Simple, robust, sub-second latency. Right for SmartCourse-scale.
+1. **Polling relay (what we have).** Simple, robust, sub-second latency. Right for production-scale.
 2. **Postgres `LISTEN/NOTIFY`.** The outbox INSERT fires `NOTIFY`; the relay is `LISTEN`-ing. Push-driven, sub-100 ms. Downside: `NOTIFY` isn't durable — if no one's listening that instant, the notification is lost. Pragmatic shape is LISTEN + poll as fallback.
 3. **Debezium + Postgres logical replication (CDC).** Production-grade. Postgres streams row changes to a replication slot; Debezium turns the stream into Kafka messages. Zero polling, zero application code in the relay role. Downside: Kafka Connect cluster + Debezium plugin = more moving parts.
 4. **Embed the event inside a workflow engine.** This is what `course.published` already does — emitted from inside a Temporal activity, whose history is the outbox-equivalent. Doesn't generalize to non-workflow flows.
@@ -2137,7 +2137,7 @@ In our project: the outbox relay is a poller; a future "archive sent outbox rows
 
 ### Q: Is it the right approach to run a dedicated long-running process just for the relay?
 
-**A:** For SmartCourse-scale, yes. The decision rests on three concrete reasons, not on pattern preference:
+**A:** For production-scale, yes. The decision rests on three concrete reasons, not on pattern preference:
 
 1. **Failure isolation.** A bug or hang in the relay does not touch the API. Users keep enrolling; the outbox accumulates; the relay restarts and drains. In-process background work in the API would couple their lifecycles — relay misbehavior would drag request latency or crash an HTTP-serving worker. Failure-domain separation is the entire point of multi-process designs.
 2. **Independent scaling.** API throughput is bound by request volume and DB connections; relay throughput is bound by Kafka publish rate. Different bottlenecks. `FOR UPDATE SKIP LOCKED` was chosen specifically so the relay scales horizontally with zero coordination: `docker compose up --scale relay=3` and each instance gets a disjoint batch.
@@ -2607,7 +2607,7 @@ This is a known, documented extension — the synchronous-path tracing already m
 - `observability/prometheus.yml` — scrape job: GET `api:8000/metrics` every 10s.
 - `observability/grafana/provisioning/datasources/prometheus.yml` — auto-adds Prometheus as a data source.
 - `observability/grafana/provisioning/dashboards/dashboards.yml` — load dashboards from a dir.
-- `observability/grafana/dashboards/smartcourse.json` — the panels (PromQL).
+- `observability/grafana/dashboards/app.json` — the panels (PromQL).
 - `docker-compose.yml` — runs prometheus + grafana, mounts the configs.
 - Runtime: app keeps counters in RAM → `/metrics` renders them → Prometheus PULLS every 10s → TSDB → Grafana queries Prometheus → panels.
 
@@ -2640,7 +2640,7 @@ Example: *"p95 jumped 600ms→3s, why?"* Logs by user_id: pick one user, eyeball
 
 **"We can attach logs to Grafana."** Yes — Grafana + Loki, and the modern setup is metrics+logs+traces all in Grafana. But that's logs in a nicer viewer, not logs doing what traces do. Grafana's killer feature is *linking*: a log line's trace_id becomes a click-through to the trace and back — which only works because trace_id is in both (why we stamp it on the JSON logs). It reinforces the case for tracing, doesn't replace it.
 
-**Honest scale caveat:** at SmartCourse's size, structured logs + metrics would get you through most debugging; tracing's marginal value grows with number of services per request, concurrent volume, and latency-sensitivity. We built it for the free latency waterfall (logs can't give it cheaply) and to demonstrate the production pattern. Right tool per question: metrics detect, traces localize, logs explain.
+**Honest scale caveat:** at the system's size, structured logs + metrics would get you through most debugging; tracing's marginal value grows with number of services per request, concurrent volume, and latency-sensitivity. We built it for the free latency waterfall (logs can't give it cheaply) and to demonstrate the production pattern. Right tool per question: metrics detect, traces localize, logs explain.
 
 ### Q: Is tracing basically "total time across services"? Doesn't Prometheus already time each request? Is a trace a stack of layers?
 

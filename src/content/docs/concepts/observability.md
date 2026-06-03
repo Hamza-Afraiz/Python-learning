@@ -70,7 +70,7 @@ parent is the whole request; children are the steps inside it.
 
 ```mermaid
 gantt
-    title One request: POST /enrollments (trace)
+    title One request: POST /orders (trace)
     dateFormat X
     axisFormat %s
     section Request
