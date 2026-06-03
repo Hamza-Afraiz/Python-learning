@@ -206,6 +206,13 @@ new MutationObserver(() => {
           label: 'Q&A Knowledge Base',
           autogenerate: { directory: 'qa' },
         },
+        {
+          label: 'Site',
+          items: [
+            { label: 'About', slug: 'about' },
+            { label: 'Privacy Policy', slug: 'privacy-policy' },
+          ],
+        },
       ],
     }),
   ],
