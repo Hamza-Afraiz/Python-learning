@@ -17,7 +17,7 @@ const BASE = '/Python-learning';
 //   3. Also update public/ads.txt with the same publisher number.
 // ---------------------------------------------------------------------------
 const ADSENSE_CLIENT = ''; // e.g. 'ca-pub-XXXXXXXXXXXXXXXX'
-const GOOGLE_SITE_VERIFICATION = ''; // e.g. 'xxxxxxxxxxxxxxxxxxxxxxxx'
+const GOOGLE_SITE_VERIFICATION = '5Am6gcPxEiRlW5nq93laj4Qk17JQI9bawm1THUCmNfo';
 
 /** Conditionally-built <head> entries for AdSense + Search Console. */
 const monetizationHead = [
